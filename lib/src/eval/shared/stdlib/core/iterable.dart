@@ -17,6 +17,10 @@ class $Iterable<E> implements Iterable<E>, $Instance {
               BridgeParameter('toElement', BridgeTypeAnnotation(BridgeTypeRef.type(RuntimeTypes.functionType)), false),
             ], returns: BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'Iterable')))),
             isStatic: false),
+        'whereType': BridgeMethodDef(
+          BridgeFunctionDef(returns: BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'Iterable')))),
+          isStatic: false,
+        ),
       },
       getters: {
         'iterator': BridgeMethodDef(
@@ -26,6 +30,14 @@ class $Iterable<E> implements Iterable<E>, $Instance {
                   BridgeTypeRef.ref('E'),
                 ]))),
             isStatic: false),
+        'length': BridgeMethodDef(
+            BridgeFunctionDef(returns: BridgeTypeAnnotation(BridgeTypeRef.type(RuntimeTypes.intType))),
+            isStatic: false),
+        'isEmpty': BridgeMethodDef(
+            BridgeFunctionDef(returns: BridgeTypeAnnotation(BridgeTypeRef.type(RuntimeTypes.boolType))),
+            isStatic: false),
+        'last':
+            BridgeMethodDef(BridgeFunctionDef(returns: BridgeTypeAnnotation(BridgeTypeRef.ref('E'))), isStatic: false),
       },
       setters: {},
       fields: {},
@@ -49,8 +61,16 @@ class $Iterable<E> implements Iterable<E>, $Instance {
         return $Function(__join);
       case 'map':
         return $Function(__map);
+      case 'whereType':
+        return $Function(_whereType);
+      case 'length':
+        return $int($value.length);
       case 'iterator':
         return $Iterator.wrap($value.iterator);
+      case 'isEmpty':
+        return $bool($value.isEmpty);
+      case 'last':
+        return $Object($value.last as Object);
       default:
         return _superclass.$getProperty(runtime, identifier);
     }
@@ -73,6 +93,10 @@ class $Iterable<E> implements Iterable<E>, $Instance {
   static $Value? _map(Runtime runtime, $Value? target, List<$Value?> args) {
     final toElement = args[0] as EvalCallable;
     return $Iterable.wrap((target!.$value as Iterable).map((e) => toElement.call(runtime, null, [e])!.$value));
+  }
+
+  static $Value? _whereType(Runtime runtime, $Value? target, List<$Value?> args) {
+    return $Iterable.wrap((target!.$value as Iterable).whereType());
   }
 
   @override

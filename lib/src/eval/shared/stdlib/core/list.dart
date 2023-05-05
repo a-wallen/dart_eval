@@ -6,6 +6,7 @@ class $List<E> implements List<E>, $Instance {
   static void configureForRuntime(Runtime runtime) {
     runtime.registerBridgeFunc('dart:core', 'List.filled', _$List_filled);
     runtime.registerBridgeFunc('dart:core', 'List.generate', _$List_generate);
+    runtime.registerBridgeFunc('dart:core', 'List.from', _$List_from);
   }
 
   /// Bridge class declaration for [$List]
@@ -33,6 +34,30 @@ class $List<E> implements List<E>, $Instance {
             ],
             returns: BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.list, [BridgeTypeRef.ref('E')])),
             generics: {'E': BridgeGenericParam()})),
+        'from': BridgeConstructorDef(
+          BridgeFunctionDef(
+            params: [
+              BridgeParameter(
+                'elements',
+                BridgeTypeAnnotation(
+                  BridgeTypeRef(CoreTypes.iterable, [BridgeTypeRef.ref('E')]),
+                ),
+                false,
+              ),
+            ],
+            namedParams: [
+              BridgeParameter(
+                'growable',
+                BridgeTypeAnnotation(
+                  BridgeTypeRef.type(RuntimeTypes.boolType),
+                ),
+                true,
+              ),
+            ],
+            returns: BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.list, [BridgeTypeRef.ref('E')])),
+            generics: {'E': BridgeGenericParam()},
+          ),
+        ),
       },
       methods: {
         '[]': BridgeMethodDef(BridgeFunctionDef(params: [
@@ -45,10 +70,30 @@ class $List<E> implements List<E>, $Instance {
         'add': BridgeMethodDef(BridgeFunctionDef(params: [
           BridgeParameter('value', BridgeTypeAnnotation(BridgeTypeRef.ref('E')), false),
         ], returns: BridgeTypeAnnotation(BridgeTypeRef.type(RuntimeTypes.voidType)))),
+        'whereType': BridgeMethodDef(
+          BridgeFunctionDef(
+            returns: BridgeTypeAnnotation(
+              BridgeTypeRef(
+                CoreTypes.iterable,
+                [BridgeTypeRef.ref('E')],
+              ),
+            ),
+          ),
+        ),
+        'removeLast': BridgeMethodDef(
+          BridgeFunctionDef(
+            returns: BridgeTypeAnnotation(
+              BridgeTypeRef.ref('E'),
+            ),
+          ),
+        ),
       },
       getters: {
         'length':
             BridgeMethodDef(BridgeFunctionDef(returns: BridgeTypeAnnotation(BridgeTypeRef.type(RuntimeTypes.intType)))),
+        'isEmpty': BridgeMethodDef(
+            BridgeFunctionDef(returns: BridgeTypeAnnotation(BridgeTypeRef.type(RuntimeTypes.boolType)))),
+        'last': BridgeMethodDef(BridgeFunctionDef(returns: BridgeTypeAnnotation(BridgeTypeRef.ref('E')))),
       },
       setters: {},
       fields: {},
@@ -74,6 +119,14 @@ class $List<E> implements List<E>, $Instance {
         return __add;
       case 'length':
         return $int($value.length);
+      case 'whereType':
+        return __whereType;
+      case 'isEmpty':
+        return $bool($super.isEmpty);
+      case 'last':
+        return $super.last;
+      case 'removeLast':
+        return $Object($value.removeLast() as Object);
     }
     return $super.$getProperty(runtime, identifier);
   }
@@ -99,11 +152,16 @@ class $List<E> implements List<E>, $Instance {
   }
 
   static const $Function __add = $Function(_add);
+  static const $Function __whereType = $Function(_whereType);
 
   static $Value? _add(Runtime runtime, $Value? target, List<$Value?> args) {
     final value = args[0]!;
     (target!.$value as List).add(value);
     return null;
+  }
+
+  static $Value? _whereType(Runtime runtime, $Value? target, List<$Value?> args) {
+    return $Iterable.wrap((target!.$value as List).whereType());
   }
 
   @override
@@ -311,4 +369,12 @@ const _$List_generate = $Function(_List_generate);
 
 $Value? _List_generate(Runtime runtime, $Value? target, List<$Value?> args) {
   return $List.wrap(List.generate(args[0]!.$value, args[1]!.$value, growable: args[2]?.$value ?? true));
+}
+
+$Function get$List_from(Runtime _) => _$List_from;
+
+const _$List_from = $Function(_List_from);
+
+$Value? _List_from(Runtime runtime, $Value? target, List<$Value?> args) {
+  return $List.wrap(List.from(args[0]!.$value, growable: args[1]?.$value ?? true));
 }
